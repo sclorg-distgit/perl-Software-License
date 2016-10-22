@@ -1,0 +1,121 @@
+--- t/creative_commons.t
++++ t/creative_commons.t
+@@ -10,6 +10,8 @@ BEGIN {
+   or plan skip_all => "requires Software::License::CCpack to test this";
+ }
+ 
++plan tests => 1;
++
+ {
+   my $license = Software::License::CC_BY_1_0->new({holder => 'DUMMY'})->notice;
+   my $pod = "=head1 LICENSE\n\n$license\n=cut\n";
+@@ -19,4 +21,3 @@ BEGIN {
+   );
+ }
+ 
+-done_testing;
+--- t/custom.t
++++ t/custom.t
+@@ -2,7 +2,7 @@
+ use strict;
+ use warnings;
+ 
+-use Test::More;
++use Test::More tests => 8;
+ 
+ use Software::License::Custom;
+ 
+@@ -40,5 +40,3 @@ Well... this is only some sample text. I
+ 
+ Yes, spanning more lines and more paragraphs.
+ END_OF_FULLTEXT
+-
+-done_testing;
+--- t/guess_license_from_pod.t
++++ t/guess_license_from_pod.t
+@@ -3,7 +3,7 @@
+ use strict;
+ use warnings;
+ 
+-use Test::More;
++use Test::More tests => 1;
+ use Software::LicenseUtils;
+ 
+ {
+@@ -32,4 +32,3 @@ LICENSE
+   );
+ }
+ 
+-done_testing;
+--- t/guess_meta_license.t
++++ t/guess_meta_license.t
+@@ -64,4 +64,3 @@ is_deeply(
+   [ ],
+ );
+ 
+-done_testing;
+--- t/meta-names.t
++++ t/meta-names.t
+@@ -2,13 +2,16 @@
+ use strict;
+ use warnings;
+ 
+-use Test::More 0.88;
++use Test::More;
+ 
+ my @files = <lib/Software/License/*.pm>;
+ 
++plan tests => scalar @files;
++
+ for my $module (@files) {
+   # It's retired.  Dunno if it's okay to be open_source.  Punt!
+-  next if $module =~ /Sun.pm$/;
++  SKIP: {
++  skip "Dunno if it's okay for Sun.pm to be open_source", 1 if $module =~ /Sun.pm$/;
+ 
+   my $pkg = $module;
+   $pkg =~ s{^lib/}{};
+@@ -18,6 +21,5 @@ for my $module (@files) {
+   eval "require $pkg; 1";
+ 
+   ok(defined $pkg->meta_name, "$pkg provide meta_name");
++  }
+ }
+-
+-done_testing;
+--- t/two-dots.t
++++ t/two-dots.t
+@@ -32,6 +32,8 @@ my @licenses = qw(
+     Zlib
+ );
+ 
++plan tests => 3 * scalar(@licenses);
++
+ for my $l (@licenses) {
+     my $class = 'Software::License::' . $l;
+     require_ok($class);
+@@ -48,4 +50,3 @@ for my $l (@licenses) {
+     );
+ }
+ 
+-done_testing;
+--- xt/release/changes_has_content.t
++++ xt/release/changes_has_content.t
+@@ -2,7 +2,7 @@
+ 
+ use Test::More tests => 2;
+ 
+-note 'Checking Changes';
++diag 'Checking Changes';
+ my $changes_file = 'Changes';
+ my $newver = '0.103012';
+ my $trial_token = '-TRIAL';
+@@ -14,8 +14,6 @@ SKIP: {
+     ok(_get_changes($newver), "$changes_file has content for $newver");
+ }
+ 
+-done_testing;
+-
+ # _get_changes copied and adapted from Dist::Zilla::Plugin::Git::Commit
+ # by Jerome Quelin
+ sub _get_changes
